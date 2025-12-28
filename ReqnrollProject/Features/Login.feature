@@ -3,6 +3,7 @@
   I want to log into the application
   So that I can access my account
 
+@retry
 Scenario: Login should succeed with valid credentials
 	Given user is on the login page
 	When user enters valid username and password

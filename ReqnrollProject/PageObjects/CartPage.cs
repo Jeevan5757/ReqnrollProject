@@ -8,23 +8,19 @@ using System.Threading.Tasks;
 
 namespace ReqnrollProject.PageObjects
 {
-    public class CartPage
+    public class CartPage: BasePage
     {
-        private readonly IWebDriver _driver;
-        private readonly WaitHelper _waitHelper;
 
-        public CartPage(IWebDriver driver)
+        public CartPage(IWebDriver driver): base(driver)
         {
-            _driver = driver;
-            _waitHelper = new WaitHelper(_driver);
         }
 
         private By products => By.CssSelector("div.cartSection h3");
 
         public bool IsProductDisplayedInCart(string productName)
         {
-            _waitHelper.WaitForElementVisible(products);
-            IList<IWebElement> elements = _driver.FindElements(products);
+            Wait.WaitForElementVisible(products);
+            IList<IWebElement> elements = Driver.FindElements(products);
 
             return elements.Any(e =>
                 e.Text.Equals(productName, StringComparison.OrdinalIgnoreCase));

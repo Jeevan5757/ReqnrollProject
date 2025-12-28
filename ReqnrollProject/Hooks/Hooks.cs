@@ -22,8 +22,9 @@ namespace ReqnrollProject.Hooks
         [BeforeScenario]
         public void InitializeBrowser()
         {
-            _driverContext.Driver = _WebDriverSupport.getDriver();
-            
+            _driverContext.Driver =
+                    _WebDriverSupport.getDriver();
+
         }
 
 

@@ -89,6 +89,7 @@ namespace ReqnrollProject.Hooks
 
             if (scenarioContext.TestError != null)
             {
+                Logging.Error(scenarioContext.TestError.Message);
                 string screenshotPath = CaptureScreenshot(scenarioContext);
                 stepNode.Fail(scenarioContext.TestError.Message)
                         .AddScreenCaptureFromPath(screenshotPath);
@@ -138,6 +139,27 @@ namespace ReqnrollProject.Hooks
 
             screenshot.SaveAsFile(filePath);
             return filePath;
+        }
+
+        public static void Log(string level, string message)
+        {
+            if (_scenario == null)
+                return;
+
+            switch (level)
+            {
+                case "INFO":
+                    _scenario.Info(message);
+                    break;
+
+                case "WARN":
+                    _scenario.Warning(message);
+                    break;
+
+                case "ERROR":
+                    _scenario.Fail(message);
+                    break;
+            }
         }
 
 

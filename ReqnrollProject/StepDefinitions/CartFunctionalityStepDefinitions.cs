@@ -27,11 +27,10 @@ namespace ReqnrollProject.StepDefinitions
         [Then("verify cart page displays the added item")]
         public void ThenVerifyCartPageDisplaysTheAddedItem()
         {
+            Logging.Info("Verifying cart page diplaying added item");
             _homePage.goToCart();
             foreach (var product in _cartContext.Products)
             {
-                TestContext.Progress.WriteLine("Products in the cart context:");
-                TestContext.Progress.WriteLine($"Verifying product: {product} in the cart");
                 Assert.That(
                     _cartPage.IsProductDisplayedInCart(product),
                     $"{product} was not found in the cart");

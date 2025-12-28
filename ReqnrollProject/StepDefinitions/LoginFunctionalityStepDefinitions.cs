@@ -22,6 +22,7 @@ namespace ReqnrollProject.StepDefinitions
         [When("user enters valid username and password")]
         public void WhenUserEntersValidUsernameAndPassword()
         {
+            Logging.Info("User attempts to login with valid credentials");
             _loginPage.LoginwithValidCredentials();
         }
 
