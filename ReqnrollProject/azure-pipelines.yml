@@ -1,0 +1,34 @@
+trigger:
+- main   # Change if your branch name is different
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+
+# Install .NET 8 SDK
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+
+# Restore NuGet packages
+- script: dotnet restore
+  displayName: 'Restore packages'
+
+# Build project
+- script: dotnet build --configuration $(buildConfiguration) --no-restore
+  displayName: 'Build project'
+
+# Run Reqnroll tests
+- script: dotnet test --configuration $(buildConfiguration) --no-build --logger "trx"
+  displayName: 'Run Tests'
+
+# Publish test results in Azure DevOps
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/*.trx'
+    testRunTitle: 'Reqnroll Test Results'
