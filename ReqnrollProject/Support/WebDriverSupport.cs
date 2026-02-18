@@ -52,7 +52,8 @@ namespace ReqnrollProject.Support
                         _driver = new FirefoxDriver(firefoxOptions);
                         break;
                     case "edge":
-                        new DriverManager().SetUpDriver(new EdgeConfig());
+                        var edgeVersion = GetEdgeVersion();
+                        new DriverManager().SetUpDriver(new EdgeConfig(), edgeVersion);
                         EdgeOptions edgeOptions = new EdgeOptions();
                         if (isHeadless)
                         {
@@ -79,5 +80,23 @@ namespace ReqnrollProject.Support
             _driver?.Quit();
             _driver = null;
         }
+
+        private static string GetEdgeVersion()
+        {
+            var process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/c reg query \"HKEY_CURRENT_USER\\Software\\Microsoft\\Edge\\BLBeacon\" /v version";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+
+            var match = System.Text.RegularExpressions.Regex.Match(output, @"\d+\.\d+\.\d+\.\d+");
+            return match.Success ? match.Value : "latest";
+        }
+
     }
 }
