@@ -32,3 +32,11 @@ steps:
   inputs:
     testResultsFiles: '**/*.trx'
     testRunTitle: 'Reqnroll Test Results'
+
+# Upload reports (Extent + Screenshots)
+- task: PublishBuildArtifacts@1
+  displayName: 'Upload Automation Reports'
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/Reports'
+    ArtifactName: 'AutomationReports'
+    publishLocation: 'Container'
