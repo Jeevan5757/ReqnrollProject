@@ -27,6 +27,12 @@ steps:
 - script: dotnet test --configuration $(buildConfiguration) --no-build --logger "trx"
   displayName: 'Run Tests'
 
+- script: |
+    echo ===== SEARCHING FOR REPORTS =====
+    dir D:\a /s /b | findstr Reports
+  displayName: 'Find Reports Folder'
+
+
 # Publish test results in Azure DevOps
 - task: PublishTestResults@2
   inputs:
