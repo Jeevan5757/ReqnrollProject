@@ -110,17 +110,18 @@ namespace ReqnrollProject.Hooks
                 "And" => _scenario.CreateNode<And>(stepInfo)
             };
 
+            string screenshotPath = CaptureScreenshot(scenarioContext);
             if (scenarioContext.TestError != null)
             {
                 Logging.Error(scenarioContext.TestError.Message);
-                string screenshotPath = CaptureScreenshot(scenarioContext);
+                
                 stepNode.Fail(scenarioContext.TestError.Message)
                         .AddScreenCaptureFromPath(screenshotPath);
 
             }
             else
             {
-                stepNode.Pass("Step passed");
+                stepNode.Pass("Step passed").AddScreenCaptureFromPath(screenshotPath);
 
             }
         }
