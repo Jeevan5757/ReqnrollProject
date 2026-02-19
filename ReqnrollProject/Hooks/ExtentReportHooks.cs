@@ -31,17 +31,48 @@ namespace ReqnrollProject.Hooks
             
         }
 
-        
-        
 
-        [BeforeTestRun]
+
+
+        /*[BeforeTestRun]
         public static void initializeReport()
         {
             String workingdirectory = Environment.CurrentDirectory;
             String ProjectDirectory = Directory.GetParent(workingdirectory).Parent.Parent.FullName;
             String reportPath = $"{ProjectDirectory}//Reports";
             String reportFile = Path.Combine(reportPath, $"{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.html");
+
             
+            if (!Directory.Exists(reportPath))
+            {
+                Directory.CreateDirectory(reportPath);
+            }
+            var htmlreporter = new ExtentSparkReporter(reportFile);
+            htmlreporter.Config.Theme = Theme.Dark;
+            _extent = new ExtentReports();
+            _extent.AttachReporter(htmlreporter);
+            _extent.AddSystemInfo("OS", Environment.OSVersion.ToString());
+            _extent.AddSystemInfo("Machine", Environment.MachineName);
+            _extent.AddSystemInfo("User", Environment.UserName);
+            _extent.AddSystemInfo("Browser", Configreader.Browser);
+            _extent.AddSystemInfo("Base URL", Configreader.BaseUrl);
+        }*/
+
+        [BeforeTestRun]
+        public static void initializeReport()
+        {
+            String workingdirectory = Environment.CurrentDirectory;
+            String ProjectDirectory = Directory.GetParent(workingdirectory).Parent.Parent.FullName;
+            //String reportPath = $"{ProjectDirectory}//Reports";
+
+            var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var basePath = Path.GetDirectoryName(assemblyPath);
+            var reportPath = Path.Combine(basePath, "Reports");
+
+            String reportFile = Path.Combine(reportPath, $"{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.html");
+            // Create Reports folder inside bin execution directory
+
+
             if (!Directory.Exists(reportPath))
             {
                 Directory.CreateDirectory(reportPath);
@@ -57,7 +88,7 @@ namespace ReqnrollProject.Hooks
             _extent.AddSystemInfo("Base URL", Configreader.BaseUrl);
         }
 
-        
+
         [BeforeFeature]
         public static void BeforeFeature(FeatureContext featureContext)
         {
@@ -134,7 +165,7 @@ namespace ReqnrollProject.Hooks
             _extent.Flush();
         }
 
-        private string CaptureScreenshot(ScenarioContext scenarioContext)
+        /*private string CaptureScreenshot(ScenarioContext scenarioContext)
         {
             var driver = _driverContext.Driver;
             var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
@@ -163,7 +194,42 @@ namespace ReqnrollProject.Hooks
 
             screenshot.SaveAsFile(filePath);
             return filePath;
+        }*/
+        private string CaptureScreenshot(ScenarioContext scenarioContext)
+        {
+            var driver = _driverContext.Driver;
+            var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+            // Get runtime execution directory (IMPORTANT)
+            var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var basePath = Path.GetDirectoryName(assemblyPath);
+
+            // Create Screenshots folder inside Reports
+            var screenshotsDir = Path.Combine(basePath, "Reports", "Screenshots");
+
+            if (!Directory.Exists(screenshotsDir))
+            {
+                Directory.CreateDirectory(screenshotsDir);
+            }
+
+            // Safe file name
+            string safeScenarioTitle = string.Concat(
+                scenarioContext.ScenarioInfo.Title
+                .Split(Path.GetInvalidFileNameChars())
+            ).Replace(" ", "_");
+
+            TestContext.Progress.WriteLine($"scenario title: {scenarioContext.ScenarioInfo.Title}");
+
+            string filePath = Path.Combine(
+                screenshotsDir,
+                $"{safeScenarioTitle}_{DateTime.Now:ddMMyyyy_HHmmss}.png"
+            );
+
+            screenshot.SaveAsFile(filePath);
+
+            return filePath;
         }
+
 
         public static void Log(string level, string message)
         {
