@@ -37,6 +37,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Upload Automation Reports'
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/**/Reports'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/**/bin/**/Reports'
     ArtifactName: 'AutomationReports'
     publishLocation: 'Container'
