@@ -42,7 +42,8 @@ steps:
 # Upload reports (Extent + Screenshots)- task: PublishBuildArtifacts@1
 - task: PublishBuildArtifacts@1
   displayName: 'Upload Automation Reports'
+  condition: succeededOrFailed()
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/**/bin/**/Reports'
+    PathtoPublish: '$(Build.SourcesDirectory)/ReqnrollProject/bin/Release/net8.0/Reports'
     ArtifactName: 'AutomationReports'
     publishLocation: 'Container'
