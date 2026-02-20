@@ -27,6 +27,12 @@ steps:
 - script: dotnet test --configuration $(buildConfiguration) --no-build --logger "trx"
   displayName: 'Run Tests'
 
+- script: |
+    echo ===== SEARCHING FOR REPORTS =====
+    dir D:\a /s /b | findstr Reports
+  displayName: 'Find Reports Folder'
+
+
 # Publish test results in Azure DevOps
 - task: PublishTestResults@2
   inputs:
@@ -36,7 +42,8 @@ steps:
 # Upload reports (Extent + Screenshots)- task: PublishBuildArtifacts@1
 - task: PublishBuildArtifacts@1
   displayName: 'Upload Automation Reports'
+  condition: succeededOrFailed()
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/**/Reports'
+    PathtoPublish: '$(Build.SourcesDirectory)/ReqnrollProject/bin/Release/net8.0/Reports'
     ArtifactName: 'AutomationReports'
     publishLocation: 'Container'
