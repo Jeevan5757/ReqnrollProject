@@ -124,6 +124,25 @@ namespace ReqnrollProject.Hooks
             //_scenario.CreateNode<And>("Execution Summary")
             // .Info($"Execution Time: {duration.TotalSeconds:F2} seconds");
             //_scenario.Info($"Execution Time: {duration.TotalSeconds} seconds");
+            try
+            {
+                // always attach screenshot (pass or fail as your requirement)
+                var driver = _driverContext.Driver;
+                var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+
+                // IMPORTANT: Azure agent safe folder
+                string fileName = $"{scenarioContext.ScenarioInfo.Title}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+                string filePath = Path.Combine(TestContext.CurrentContext.WorkDirectory, fileName);
+
+                screenshot.SaveAsFile(filePath);
+
+                // THIS is what Azure DevOps reads
+                TestContext.AddTestAttachment(filePath, "Scenario Screenshot");
+            }
+            catch (Exception ex)
+            {
+                TestContext.Progress.WriteLine("Attachment failed: " + ex.Message);
+            }
         }
 
         [AfterStep]
