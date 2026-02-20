@@ -24,8 +24,15 @@ steps:
   displayName: 'Build project'
 
 # Run Reqnroll tests
-- script: dotnet test --configuration $(buildConfiguration) --no-build --logger "trx"
+- script: |
+    echo Running tests and forcing TRX location...
+    dotnet test --configuration $(buildConfiguration) --logger "trx;LogFileName=TestResults.trx" --results-directory "$(Agent.TempDirectory)"
   displayName: 'Run Tests'
+
+- script: |
+    echo ===== TRX FILES INSIDE AGENT TEMP =====
+    dir $(Agent.TempDirectory)
+  displayName: 'Verify TRX Exists'
 
 - script: |
     echo ===== SEARCHING FOR REPORTS =====
@@ -36,7 +43,10 @@ steps:
 # Publish test results in Azure DevOps
 - task: PublishTestResults@2
   inputs:
-    testResultsFiles: '**/*.trx'
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '$(Agent.TempDirectory)/*.trx'
+    searchFolder: '$(Agent.TempDirectory)'
+    mergeTestResults: true
     testRunTitle: 'Reqnroll Test Results'
 
 # Upload reports (Extent + Screenshots)- task: PublishBuildArtifacts@1
