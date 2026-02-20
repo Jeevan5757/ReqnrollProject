@@ -227,7 +227,9 @@ namespace ReqnrollProject.Hooks
 
             screenshot.SaveAsFile(filePath);
 
-            return filePath;
+            var relativePath = Path.Combine("Screenshots", Path.GetFileName(filePath));
+            return relativePath;
+
         }
 
 
