@@ -29,16 +29,6 @@ steps:
     dotnet test --configuration $(buildConfiguration) --logger "trx;LogFileName=TestResults.trx" --results-directory "$(Agent.TempDirectory)"
   displayName: 'Run Tests'
 
-- script: |
-    echo ===== TRX FILES INSIDE AGENT TEMP =====
-    dir $(Agent.TempDirectory)
-  displayName: 'Verify TRX Exists'
-
-- script: |
-    echo ===== SEARCHING FOR REPORTS =====
-    dir D:\a /s /b | findstr Reports
-  displayName: 'Find Reports Folder'
-
 
 # Publish test results in Azure DevOps
 - task: PublishTestResults@2
