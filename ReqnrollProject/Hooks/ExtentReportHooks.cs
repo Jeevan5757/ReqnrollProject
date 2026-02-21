@@ -24,6 +24,7 @@ namespace ReqnrollProject.Hooks
         private readonly DriverContext _driverContext;
         private DateTime _scenarioStartTime;
         private readonly double SlowThresholdSeconds = 10.0;
+        private List<string> _scenarioScreenshotFiles;
 
         public ExtentReportHooks(DriverContext driverContext)
         {
@@ -98,6 +99,7 @@ namespace ReqnrollProject.Hooks
         [BeforeScenario]
         public void BeforeScenario(ScenarioContext scenarioContext)
         {
+            _scenarioScreenshotFiles = new List<string>();
             _scenario = _feature.CreateNode<Scenario>(scenarioContext.ScenarioInfo.Title);
             _scenarioStartTime = DateTime.Now;
         }
@@ -124,24 +126,27 @@ namespace ReqnrollProject.Hooks
             //_scenario.CreateNode<And>("Execution Summary")
             // .Info($"Execution Time: {duration.TotalSeconds:F2} seconds");
             //_scenario.Info($"Execution Time: {duration.TotalSeconds} seconds");
+            
+        }
+        [AfterScenario(Order = 100)]
+        public void AttachScreenshotsToAzure()
+        {
             try
             {
-                // always attach screenshot (pass or fail as your requirement)
-                var driver = _driverContext.Driver;
-                var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+                if (_scenarioScreenshotFiles == null || _scenarioScreenshotFiles.Count == 0)
+                    return;
 
-                // IMPORTANT: Azure agent safe folder
-                string fileName = $"{scenarioContext.ScenarioInfo.Title}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-                string filePath = Path.Combine(TestContext.CurrentContext.WorkDirectory, fileName);
-
-                screenshot.SaveAsFile(filePath);
-
-                // THIS is what Azure DevOps reads
-                TestContext.AddTestAttachment(filePath, "Scenario Screenshot");
+                foreach (var screenshot in _scenarioScreenshotFiles)
+                {
+                    if (File.Exists(screenshot))
+                    {
+                        TestContext.AddTestAttachment(screenshot, Path.GetFileName(screenshot));
+                    }
+                }
             }
             catch (Exception ex)
             {
-                TestContext.Progress.WriteLine("Attachment failed: " + ex.Message);
+                TestContext.Progress.WriteLine("Azure attachment failed: " + ex.Message);
             }
         }
 
@@ -245,6 +250,7 @@ namespace ReqnrollProject.Hooks
             );
 
             screenshot.SaveAsFile(filePath);
+            _scenarioScreenshotFiles.Add(filePath);
 
             var relativePath = Path.Combine("Screenshots", Path.GetFileName(filePath));
             //var relativePath = "Screenshots/" + Path.GetFileName(filePath);
