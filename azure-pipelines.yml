@@ -1,3 +1,9 @@
+parameters:
+- name: testTag
+  displayName: "Run Tests With Tag"
+  type: string
+  default: login
+
 trigger:
 - main   # Change if your branch name is different
 
@@ -22,12 +28,13 @@ steps:
 # Build project
 - script: dotnet build --configuration $(buildConfiguration) --no-restore
   displayName: 'Build project'
+  
 
-# Run Reqnroll tests
+# Run Reqnroll tests by tag
 - script: |
-    echo Running tests and forcing TRX location...
-    dotnet test --configuration $(buildConfiguration) --logger "trx;LogFileName=TestResults.trx" --results-directory "$(Agent.TempDirectory)"
-  displayName: 'Run Tests'
+    echo Running tests with tag: ${{ parameters.testTag }}
+    dotnet test --configuration $(buildConfiguration) --logger "trx;LogFileName=TestResults.trx" --results-directory "$(Agent.TempDirectory)" --filter "TestCategory=${{ parameters.testTag }}"
+  displayName: 'Run Tagged Tests'
 
 
 # Publish test results in Azure DevOps
