@@ -3,18 +3,19 @@
   I want to log into the application
   So that I can access my account
 
-@retry
+@login
 Scenario: Login should succeed with valid credentials
 	Given user is on the login page
 	When user enters valid username and password
 	Then user should be redirected to the dashboard
 
-
+@addToCart
 Scenario: Verify item can be added to cart
 	Given user is logged in
 	When user adds "IPHONE 13 PRO" and "ZARA COAT 3" item to the cart
 	Then the product should be added to the cart
 
+@cartPage
 Scenario: verify cart page displays added items
 	Given user has following item in the cart
 	| productName   |
